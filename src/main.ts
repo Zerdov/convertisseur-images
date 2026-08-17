@@ -11,25 +11,35 @@ let sizesChoice: SizesChoice = { mode: 'full' };
 let webpSupported = false;
 
 function baseName(filename: string): string {
-  return filename.replace(/\.[^.]+$/, '');
+  const withoutExt = filename.replace(/\.[^.]+$/, '');
+  return withoutExt.replace(/[^a-zA-Z0-9._-]+/g, '-');
 }
 
 async function handleGenerate(): Promise<void> {
   const statusEl = document.querySelector<HTMLElement>('#status');
   const resultsEl = document.querySelector<HTMLElement>('#results');
+  const generateButton = document.querySelector<HTMLButtonElement>('#generate-button');
   if (!selectedFile || !statusEl || !resultsEl) return;
 
   statusEl.textContent = 'Génération en cours...';
+  if (generateButton) {
+    generateButton.disabled = true;
+  }
 
   try {
     const result = await processImage(selectedFile, { generateWebp: webpSupported });
     const name = baseName(selectedFile.name);
     const jpegFilename = `${name}-fallback.jpg`;
 
+    const webpFileEntries = result.webpVariants.map((variant) => ({
+      variant,
+      filename: `${name}-${variant.label}.webp`,
+    }));
+
     const files: GeneratedFile[] = [
       { filename: jpegFilename, blob: result.jpeg.blob },
-      ...result.webpVariants.map((variant) => ({
-        filename: `${name}-${variant.label}.webp`,
+      ...webpFileEntries.map(({ filename, variant }) => ({
+        filename,
         blob: variant.blob,
       })),
     ];
@@ -38,10 +48,10 @@ async function handleGenerate(): Promise<void> {
       jpegFilename,
       jpegWidth: result.jpeg.width,
       jpegHeight: result.jpeg.height,
-      webpFiles: result.webpVariants.map((variant) => ({
+      webpFiles: webpFileEntries.map(({ filename, variant }) => ({
         label: variant.label,
         width: variant.width,
-        filename: `${name}-${variant.label}.webp`,
+        filename,
       })),
       sizes: sizesChoiceToAttribute(sizesChoice),
     });
@@ -52,6 +62,10 @@ async function handleGenerate(): Promise<void> {
       : 'Génération terminée (WebP non supporté par ce navigateur : seul le JPEG a été produit).';
   } catch (error) {
     statusEl.textContent = `Erreur lors de la génération : ${(error as Error).message}`;
+  } finally {
+    if (generateButton) {
+      generateButton.disabled = false;
+    }
   }
 }
 

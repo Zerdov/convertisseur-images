@@ -32,7 +32,7 @@ describe('processImage', () => {
     vi.restoreAllMocks();
   });
 
-  it('ne dépasse jamais la largeur de la source pour une image plus petite que "small"', async () => {
+  it('ne dépasse jamais la largeur de la source et déduplique les variantes pour une image plus petite que "small"', async () => {
     mockCreateImageBitmap(300, 200);
     const file = new File(['data'], 'photo.png', { type: 'image/png' });
 
@@ -40,9 +40,18 @@ describe('processImage', () => {
 
     expect(result.jpeg.width).toBe(300);
     expect(result.jpeg.height).toBe(200);
-    for (const variant of result.webpVariants) {
-      expect(variant.width).toBe(300);
-    }
+    expect(result.webpVariants).toHaveLength(1);
+    expect(result.webpVariants[0]).toMatchObject({ label: 'small', width: 300, height: 200 });
+  });
+
+  it('déduplique partiellement les variantes pour une image plus étroite que "large" mais plus large que "small"', async () => {
+    mockCreateImageBitmap(600, 400);
+    const file = new File(['data'], 'photo.png', { type: 'image/png' });
+
+    const result = await processImage(file, { generateWebp: true });
+
+    expect(result.webpVariants.map((v) => v.label)).toEqual(['small', 'medium']);
+    expect(result.webpVariants.map((v) => v.width)).toEqual([480, 600]);
   });
 
   it('génère les largeurs small/medium/large pour une image plus grande que "large"', async () => {

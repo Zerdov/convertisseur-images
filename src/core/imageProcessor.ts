@@ -68,8 +68,13 @@ export async function processImage(
 
     const webpVariants: ImageVariant[] = [];
     if (options.generateWebp) {
+      const emittedWidths = new Set<number>();
       for (const label of WEBP_LABELS) {
         const variant = await resizeToBlob(bitmap, WEBP_WIDTHS[label], 'image/webp', WEBP_QUALITY);
+        if (emittedWidths.has(variant.width)) {
+          continue;
+        }
+        emittedWidths.add(variant.width);
         webpVariants.push({ label, ...variant });
       }
     }

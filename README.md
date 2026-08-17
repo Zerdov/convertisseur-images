@@ -40,7 +40,7 @@ npm run build    # build de production dans dist/
 
 ## Stack
 
-TypeScript + Vite, sans framework UI (choix volontaire pour ce premier projet front-end : démontrer la maîtrise du DOM et des API natives — Canvas ici, Web Workers/Service Worker dans les évolutions futures — avant de s'appuyer sur un framework). CSS natif (pas de préprocesseur). Tests unitaires avec Vitest, limités à la logique métier pure du dossier `core/`.
+TypeScript + Vite, sans framework UI (choix volontaire pour ce premier projet front-end : démontrer la maîtrise du DOM et des API natives — Canvas ici, Web Workers/Service Worker dans les évolutions futures — avant de s'appuyer sur un framework). CSS natif (pas de préprocesseur). Tests unitaires avec Vitest, limités à la logique métier pure (fonctions sans effet de bord), qu'elle vive dans `core/` ou comme fonction pure isolée dans `ui/`.
 
 ## Roadmap
 
