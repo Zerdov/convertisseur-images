@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Générateur d'images responsive</title>
+  </head>
+  <body>
+    <main>
+      <h1>Générateur de set d'images responsive</h1>
+
+      <section id="dropzone" class="dropzone">
+        <p>Glissez-déposez une image ici, ou cliquez pour en choisir une.</p>
+      </section>
+
+      <section id="sizes-selector"></section>
+
+      <button id="generate-button" type="button" disabled>Générer</button>
+
+      <p id="status" role="status"></p>
+
+      <section id="results"></section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
