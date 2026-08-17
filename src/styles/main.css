@@ -237,6 +237,26 @@ h1 {
   border-top: 1px dashed var(--line);
 }
 
+.download-all {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.download-all:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
 .result-files {
   list-style: none;
   margin: 0 0 1.25rem;

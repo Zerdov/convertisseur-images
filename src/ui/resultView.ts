@@ -10,10 +10,13 @@ export function renderResults(
 ): void {
   container.innerHTML = '';
 
+  const downloadEntries: { url: string; filename: string }[] = [];
+
   const fileList = document.createElement('ul');
   fileList.className = 'result-files';
   for (const file of files) {
     const url = URL.createObjectURL(file.blob);
+    downloadEntries.push({ url, filename: file.filename });
     const item = document.createElement('li');
     const link = document.createElement('a');
     link.href = url;
@@ -22,6 +25,23 @@ export function renderResults(
     item.appendChild(link);
     fileList.appendChild(item);
   }
+
+  const downloadAllButton = document.createElement('button');
+  downloadAllButton.type = 'button';
+  downloadAllButton.className = 'download-all';
+  downloadAllButton.textContent = 'Tout télécharger';
+  downloadAllButton.addEventListener('click', () => {
+    downloadEntries.forEach(({ url, filename }, index) => {
+      setTimeout(() => {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.click();
+      }, index * 250);
+    });
+  });
+  container.appendChild(downloadAllButton);
+
   container.appendChild(fileList);
 
   const snippetBlock = document.createElement('div');
