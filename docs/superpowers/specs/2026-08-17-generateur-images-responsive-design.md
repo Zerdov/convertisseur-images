@@ -58,13 +58,14 @@ Les modules `ui/` orchestrent le DOM et appellent les modules `core/` ; ils ne c
 1. Utilisateur dépose/sélectionne une image → `dropzone.ts` lit le `File`
 2. `webpSupport.ts` vérifie le support WebP au chargement de la page (une seule fois, pas à chaque conversion) ; si absent, message explicite qui bloque la génération WebP (jamais d'échec silencieux)
 3. Utilisateur choisit "pleine largeur" ou "conteneur limité" (+ largeur max en px) → `sizesSelector.ts`
-4. Clic "Générer" → `imageProcessor.ts` dessine l'image sur un `<canvas>` à 3 largeurs fixes (small/medium/large) + génère le JPEG fallback via `canvas.toBlob()`
+4. Clic "Générer" → `imageProcessor.ts` dessine l'image sur un `<canvas>` et génère systématiquement le JPEG (destiné à l'`<img>` de secours du `<picture>`) ; les 3 variantes WebP (small/medium/large) ne sont générées que si `webpSupport.ts` a détecté le support d'encodage
 5. `snippetGenerator.ts` construit le HTML `<picture>` à partir des noms de fichiers et largeurs réellement produits + l'attribut `sizes` choisi (jamais de valeur codée en dur ou omise)
 6. `resultView.ts` affiche les 4 fichiers (téléchargeables) + le snippet (copiable)
 
 ## Gestion d'erreurs
 
-- Pas de support WebP → message explicite à l'utilisateur ; le JPEG fallback reste généré (dégradation partielle, pas un blocage total)
+- Le JPEG est **toujours généré, sans condition** — ce n'est pas un fallback pour l'outil lui-même, mais la sortie destinée à l'`<img>` de secours dans le `<picture>` du développeur qui utilise l'outil (visiteurs de son site sans support WebP). Le terme "fallback" dans le SPEC désigne cet usage-là, pas un plan B interne à l'outil.
+- Pas de support d'encodage WebP dans le navigateur de l'utilisateur de l'outil → message explicite ; seul le JPEG est produit (les 3 variantes WebP ne le sont pas). Dégradation partielle assumée et annoncée, jamais un blocage total ni un échec silencieux.
 - Fichier non-image ou trop volumineux → validation à l'entrée avec message utilisateur clair, avant tout traitement Canvas
 - Échec de `canvas.toBlob()` (cas rare : mémoire, format) → message d'erreur affiché, jamais de crash silencieux ni de promesse qui reste en attente indéfiniment
 
